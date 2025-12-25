@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>祖国统一倒计时</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-red: #c8102e;
+            --secondary-red: #ed1c24;
+            --gold: #ffde00;
+            --dark-bg: #1a1a1a;
+            --text-white: #ffffff;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(to bottom, var(--dark-bg) 0%, #2d1b1b 50%, var(--primary-red) 100%);
+            background-attachment: fixed;
+            color: var(--text-white);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* 头部区域 */
+        .header {
+            text-align: center;
+            padding: 30px 20px 20px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .national-emblem {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .main-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--gold);
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: normal;
+        }
+
+        /* 免责声明 */
+        .disclaimer {
+            background: rgba(255, 222, 0, 0.15);
+            border: 1px solid rgba(255, 222, 0, 0.3);
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin: 0 20px 30px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
+            animation: fadeIn 1.5s ease;
+        }
+
+        .disclaimer-icon {
+            color: var(--gold);
+            margin-right: 5px;
+        }
+
+        /* 倒计时主体 */
+        .countdown-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .countdown-wrapper {
+            background: linear-gradient(135deg, rgba(200, 16, 46, 0.9) 0%, rgba(120, 10, 30, 0.9) 100%);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 222, 0, 0.3);
+            animation: fadeInScale 1s ease;
+        }
+
+        .countdown-label {
+            text-align: center;
+            font-size: 18px;
+            color: var(--gold);
+            margin-bottom: 25px;
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+
+        .countdown-display {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .time-unit {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 222, 0, 0.2);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .time-unit:active {
+            transform: scale(0.95);
+        }
+
+        .time-value {
+            display: block;
+            font-size: 42px;
+            font-weight: bold;
+            color: var(--text-white);
+            line-height: 1.2;
+            text-shadow: 0 0 10px rgba(255, 222, 0, 0.5);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .time-label {
+            display: block;
+            font-size: 14px;
+            color: var(--gold);
+            margin-top: 8px;
+            letter-spacing: 2px;
+        }
+
+        .target-info {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 222, 0, 0.15);
+        }
+
+        .target-date {
+            font-size: 16px;
+            color: var(--gold);
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .target-description {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 进度条区域 */
+        .progress-section {
+            background: linear-gradient(135deg, rgba(200, 16, 46, 0.8) 0%, rgba(120, 10, 30, 0.8) 100%);
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 222, 0, 0.3);
+            animation: fadeInUp 1.2s ease;
+        }
+
+        .progress-title {
+            text-align: center;
+            font-size: 18px;
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .progress-bar-container {
+            background: rgba(0, 0, 0, 0.3);
+            height: 50px;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid rgba(255, 222, 0, 0.3);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-red) 0%, var(--secondary-red) 50%, var(--gold) 100%);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .progress-percentage {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--text-white);
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 222, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 3px;
+        }
+
+        /* 大事记区域 */
+        .events-section {
+            background: linear-gradient(135deg, rgba(200, 16, 46, 0.8) 0%, rgba(120, 10, 30, 0.8) 100%);
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 222, 0, 0.3);
+            animation: fadeInUp 1.4s ease;
+        }
+
+        .events-header {
+            text-align: center;
+            font-size: 18px;
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--gold) 0%, var(--primary-red) 100%);
+            border-radius: 2px;
+        }
+
+        .event-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border-left: 3px solid var(--gold);
+            animation: slideInLeft 0.6s ease backwards;
+        }
+
+        .event-item:nth-child(1) { animation-delay: 0.1s; }
+        .event-item:nth-child(2) { animation-delay: 0.2s; }
+        .event-item:nth-child(3) { animation-delay: 0.3s; }
+        .event-item:nth-child(4) { animation-delay: 0.4s; }
+        .event-item:nth-child(5) { animation-delay: 0.5s; }
+        .event-item:nth-child(6) { animation-delay: 0.6s; }
+        .event-item:nth-child(7) { animation-delay: 0.7s; }
+
+        .event-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 20px;
+            width: 14px;
+            height: 14px;
+            background: var(--gold);
+            border-radius: 50%;
+            border: 3px solid var(--dark-bg);
+            box-shadow: 0 0 0 3px var(--gold);
+        }
+
+        .event-date {
+            font-size: 13px;
+            color: var(--gold);
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .event-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--text-white);
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .event-description {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        /* 宣传标语 */
+        .slogan-section {
+            padding: 30px 20px;
+            text-align: center;
+            animation: fadeIn 2s ease;
+        }
+
+        .slogan {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--gold);
+            line-height: 1.8;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 222, 0, 0.5);
+            letter-spacing: 3px;
+        }
+
+        .sub-slogan {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            border-top: 1px solid rgba(255, 222, 0, 0.2);
+        }
+
+        /* 动画定义 */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (min-width: 768px) {
+            .countdown-display {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .main-title {
+                font-size: 38px;
+            }
+            
+            .time-value {
+                font-size: 48px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .main-title {
+                font-size: 26px;
+            }
+            
+            .time-value {
+                font-size: 36px;
+            }
+            
+            .time-label {
+                font-size: 12px;
+            }
+            
+            .slogan {
+                font-size: 18px;
+            }
+        }
+
+        /* 暗色模式优化 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(to bottom, #000000 0%, #1a0a0a 50%, var(--primary-red) 100%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部 -->
+    <header class="header">
+        <div class="national-emblem">🇨🇳</div>
+        <h1 class="main-title">祖国统一倒计时</h1>
+        <p class="subtitle">中华民族伟大复兴的必然要求</p>
+    </header>
+
+    <!-- 免责声明 -->
+    <div class="disclaimer">
+        <span class="disclaimer-icon">⚠️</span>
+        <strong>个人解读说明：</strong>本页面为学习项目，倒计时日期及内容仅为个人解读，不代表任何官方政策文件。祖国统一是全体中华儿女的共同心愿。
+    </div>
+
+    <!-- 倒计时主体 -->
+    <main class="countdown-container">
+        <div class="countdown-wrapper">
+            <div class="countdown-label">距离目标日期</div>
+            
+            <div class="countdown-display">
+                <div class="time-unit">
+                    <span class="time-value" id="days">0</span>
+                    <span class="time-label">天</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-value" id="hours">00</span>
+                    <span class="time-label">时</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-value" id="minutes">00</span>
+                    <span class="time-label">分</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-value" id="seconds">00</span>
+                    <span class="time-label">秒</span>
+                </div>
+            </div>
+
+            <div class="target-info">
+                <div class="target-date">目标日期：2049年10月1日</div>
+                <div class="target-description">中华人民共和国成立100周年</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 统一进度 -->
+    <section class="progress-section">
+        <h2 class="progress-title">祖国统一进度</h2>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progressBar">
+                <span class="progress-percentage" id="progressText">99.62%</span>
+            </div>
+        </div>
+
+        <div class="progress-info">
+            <div><strong>📊 按陆地面积统计：</strong></div>
+            <div class="progress-stats">
+                <div class="stat-item">
+                    <span class="stat-value">960万km²</span>
+                    <span class="stat-label">陆地总面积</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">3.6万km²</span>
+                    <span class="stat-label">台湾地区面积</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 大事记 -->
+    <section class="events-section">
+        <h2 class="events-header">重要历史时刻</h2>
+        
+        <div class="timeline">
+            <div class="event-item">
+                <div class="event-date">1997年7月1日</div>
+                <div class="event-title">香港回归祖国</div>
+                <div class="event-description">中华人民共和国香港特别行政区正式成立，"一国两制"构想成功实践。</div>
+            </div>
+
+            <div class="event-item">
+                <div class="event-date">1999年12月20日</div>
+                <div class="event-title">澳门回归祖国</div>
+                <div class="event-description">中华人民共和国澳门特别行政区成立，祖国统一大业继续推进。</div>
+            </div>
+
+            <div class="event-item">
+                <div class="event-date">2005年3月14日</div>
+                <div class="event-title">《反分裂国家法》通过</div>
+                <div class="event-description">以法律形式明确反对和遏制"台独"分裂活动，维护国家主权和领土完整。</div>
+            </div>
+
+            <div class="event-item">
+                <div class="event-date">2019年1月2日</div>
+                <div class="event-title">对台工作重要讲话</div>
+                <div class="event-description">全面阐述新时代推进祖国和平统一的重大政策主张。</div>
+            </div>
+
+            <div class="event-item">
+                <div class="event-date">2020年5月28日</div>
+                <div class="event-title">香港国安法通过</div>
+                <div class="event-description">建立健全香港特别行政区维护国家安全的法律制度和执行机制。</div>
+            </div>
+
+            <div class="event-item">
+                <div class="event-date">2022年8月10日</div>
+                <div class="event-title">《台湾问题与新时代中国统一事业》白皮书</div>
+                <div class="event-description">系统阐述新时代中国统一事业的立场、原则和政策。</div>
+            </div>
+
+            <div class="event-item">
+                <div class="event-date">期待未来</div>
+                <div class="event-title">祖国完全统一</div>
+                <div class="event-description">实现祖国完全统一是全体中华儿女的共同心愿和神圣职责。</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 宣传标语 -->
+    <section class="slogan-section">
+        <div class="slogan">
+            🌟 祖国必然统一 🌟
+        </div>
+        <div class="sub-slogan">
+            天下大势，合久必分，分久必合<br>
+            中华民族伟大复兴的历史车轮滚滚向前
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>@ 55230620王福峥 55230632王桓宇</p>
+        <p style="margin-top: 5px;">HTML5 + CSS3 + JavaScript</p>
+    </footer>
+
+    <script>
+        // 倒计时核心功能
+        function updateCountdown() {
+            // 目标日期：2049年10月1日 00:00:00
+            const targetDate = new Date('2049-10-01T00:00:00+08:00').getTime();
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            // 如果已经到达目标日期
+            if (distance < 0) {
+                document.getElementById('days').textContent = '0';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                return;
+            }
+
+            // 计算时间单位
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // 更新显示（保持两位数格式）
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+
+        // 进度条动画
+        function animateProgressBar() {
+            const progressBar = document.getElementById('progressBar');
+            const percentage = 99.62; // 按陆地面积计算
+            
+            // 延迟启动动画以提升视觉效果
+            setTimeout(() => {
+                progressBar.style.width = percentage + '%';
+            }, 300);
+        }
+
+        // 防止双击缩放（移动端优化）
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+
+        // 防止页面滚动回弹（iOS优化）
+        document.body.addEventListener('touchmove', function(event) {
+            if (event.target.closest('.events-section') || event.target.closest('.timeline')) {
+                return; // 允许大事记区域滚动
+            }
+        }, { passive: true });
+
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化倒计时
+            updateCountdown();
+            
+            // 每秒更新倒计时
+            setInterval(updateCountdown, 1000);
+            
+            // 初始化进度条动画
+            animateProgressBar();
+            
+            // 添加触摸反馈效果
+            const touchElements = document.querySelectorAll('.time-unit, .event-item');
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.opacity = '0.8';
+                }, { passive: true });
+                
+                element.addEventListener('touchend', function() {
+                    this.style.opacity = '1';
+                }, { passive: true });
+            });
+        });
+
+        // 性能优化：使用requestAnimationFrame优化动画
+        let ticking = false;
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                window.requestAnimationFrame(function() {
+                    // 可以在这里添加滚动相关的动画效果
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }, { passive: true });
+
+        // 页面可见性变化时的处理
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                updateCountdown(); // 页面重新可见时立即更新倒计时
+            }
+        });
+    </script>
+</body>
+</html>
